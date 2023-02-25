@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import * as dat from 'dat.gui';
 
+
 const plants = [
     ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
     ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
@@ -51,25 +52,24 @@ function renderDropdown(plant) {
 
 }
 
-for (let [i, row] of Object.entries(plants)) {
-    const rowEl = document.createElement('tr');
-    for (let [k, plant] of Object.entries(row)) {
-        const td = document.createElement('td');
+// for (let [i, row] of Object.entries(plants)) {
+//     const rowEl = document.createElement('tr');
+//     for (let [k, plant] of Object.entries(row)) {
+//         const td = document.createElement('td');
 
-        const selectEl = renderDropdown(plant);
+//         const selectEl = renderDropdown(plant);
 
-        selectEl.addEventListener('change', (e) => {
-            plants[i][k] = e.target.value;
+//         selectEl.addEventListener('change', (e) => {
+//             plants[i][k] = e.target.value;
 
-            console.log([...plants]);
-            displayPlantsThree();
-        });
+//             displayPlantsThree();
+//         });
 
-        td.append(selectEl);
-        rowEl.append(td);
-    }
-    tbody.append(rowEl);
-}
+//         td.append(selectEl);
+//         rowEl.append(td);
+//     }
+//     tbody.append(rowEl);
+// }
 
 // Debug
 // const gui = new dat.GUI();
@@ -100,20 +100,29 @@ scene.add(floorMesh);
 let plantGroup = new THREE.Group();
 const gutter = 1.5;
 
+const plantMaterial = new THREE.MeshStandardMaterial({ color: 'green' });
+const plantGeo = new THREE.BoxGeometry(1, 1, 1);
+
+const veggieKeys = Object.keys(veggies);
 function displayPlantsThree() {
     scene.remove(plantGroup);
     plantGroup = new THREE.Group();
 
-    console.table(plants);
     plants.
         forEach((row, i) => {
             [...row].reverse().forEach((plant, k) => {
                 const plantHeight = veggies[plant].height;
-                const plantGeo = new THREE.BoxGeometry(1, plantHeight, 1);
-                const plantMaterial = new THREE.MeshStandardMaterial();
-                plantMaterial.color = new THREE.Color('green');
                 const plantMesh = new THREE.Mesh(plantGeo, plantMaterial);
-
+                plantMesh.scale.y = plantHeight;
+                plantMesh.veggieTuple = [i, plants.length - 1 - k];
+                plantMesh.onClick = (clickedVeg) => {
+                    const [row, col] = clickedVeg.object.veggieTuple;
+                    const veggieKeyIndex = veggieKeys.indexOf(plants[row][col]);
+                    const nextPlant = veggieKeys[veggieKeyIndex + 1] || veggieKeys[0];
+                    console.log(nextPlant);
+                    plants[row][col] = nextPlant;
+                    displayPlantsThree();
+                };
             // distance from middle to bottom is half of height
                 plantMesh.position.set(i * gutter, plantHeight / 2 + .5, k * gutter);
 
@@ -127,7 +136,6 @@ function displayPlantsThree() {
     plantGroup.position.x = floorMesh.position.x - offset;
     plantGroup.position.z = floorMesh.position.z - offset;
 
-    console.log(plantGroup);
     scene.add(plantGroup);
 }
 
@@ -195,13 +203,39 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 
+
+
 /**
  * Animate
  */
-const clock = new THREE.Clock();
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let intersects = [];
+
+window.addEventListener('pointermove', detectMouse);
+
+function detectMouse(e) {
+    mouse.set((e.clientX / sizes.width) * 2 - 1, -(e.clientY / sizes.height) * 2 + 1);
+    raycaster.setFromCamera(mouse, camera);
+    intersects = raycaster.intersectObjects(scene.children, true);
+}
+
+window.addEventListener('click', (e) => {
+      // Call onClick
+    const clickedOn = intersects[0];
+    console.log(clickedOn);
+
+    if (clickedOn && clickedOn && clickedOn.object && clickedOn.object.onClick) {
+        detectMouse(e);
+        clickedOn.object.onClick(clickedOn);
+    }
+});
+
 
 const tick = () =>
 {
+
+
 
     // const elapsedTime = clock.getElapsedTime();
 
