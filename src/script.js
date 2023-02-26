@@ -1,92 +1,110 @@
 import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-// import * as dat from 'dat.gui';
-import cornImg from './textures/corn.png';
-import potatoesImg from './textures/potatoes.png';
-import tomatoesImg from './textures/tomatoes.png';
-import kaleImg from './textures/kale.png';
-import dirtImg from './textures/dirt.jpg';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import * as dat from 'dat.gui';
+
+const gui = new dat.GUI();
 
 const BROWN = '#964B00';
 
 const plants = [
-    ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
+    ['kale', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
     ['tomato', 'tomato', 'tomato', 'kale', 'kale', 'kale', 'kale'],
     ['tomato', 'potato', 'corn', 'kale', 'kale', 'kale', 'kale'],
     ['tomato', 'tomato', 'tomato', 'kale', 'kale', 'kale', 'kale'],
     ['tomato', 'tomato', 'kale', 'tomato', 'tomato', 'tomato', 'tomato'],
     ['corn', 'corn', 'corn', 'tomato', 'tomato', 'tomato', 'tomato'],
     ['tomato', 'tomato', 'tomato', 'potato', 'potato', 'potato', 'potato'],
-
 ];
 
-// Debug
-// const gui = new dat.GUI();
-
-// Canvas
-const canvas = document.querySelector('canvas.webgl');
+const textureLoader = new THREE.TextureLoader();
 
 // Scene
 const scene = new THREE.Scene();
 
+const canvas = document.querySelector('canvas.webgl');
+const grassTexture = textureLoader.load('/textures/grass.jpg');
+const grassGeo = new THREE.CylinderGeometry(100, .6, .01, 24);
+
+const grassMaterial = new THREE.MeshStandardMaterial({ map: grassTexture, color: 'green' });
+const grassMesh = new THREE.Mesh(grassGeo, grassMaterial);
+scene.add(grassMesh);
+
+
+const garden = new THREE.Group();
 // Objects
-const floorSizes = {
+const soilSizes = {
     width: 12,
     length: 12,
     height: 1,
 };
 
-const floorGeo = new THREE.BoxGeometry(floorSizes.width, floorSizes.height, floorSizes.length);
-const labelGeo = new THREE.CylinderGeometry(.6, .6, .01);
 
-const textureLoader = new THREE.TextureLoader();
-
-const tomatoTexture = textureLoader.load(tomatoesImg);
-const cornTexture = textureLoader.load(cornImg);
-const potatoTexture = textureLoader.load(potatoesImg);
-const kaleTexture = textureLoader.load(kaleImg);
-const dirtTexture = textureLoader.load(dirtImg);
-const soloDirtTexture = textureLoader.load(dirtImg);
-
-dirtTexture.wrapS = THREE.RepeatWrapping;
-dirtTexture.wrapT = THREE.RepeatWrapping;
+const skyMadcap = textureLoader.load('/textures/sky.png');
+const tomatoTexture = textureLoader.load('/textures/tomatoes.png');
+const blueSkyTexture = textureLoader.load('/textures/blue-sky-bg.jpg');
+const cornTexture = textureLoader.load('/textures/corn.png');
+const potatoTexture = textureLoader.load('/textures/potatoes.png');
+const kaleTexture = textureLoader.load('/textures/kale.png');
+const dirtTexture = textureLoader.load('/textures/dirt.jpg');
+const soloDirtTexture = textureLoader.load('/textures/dirt.jpg');
 dirtTexture.repeat.set(5, 5);
 
-// Materials
+scene.background = blueSkyTexture;
+const soilGeo = new THREE.CylinderGeometry(soilSizes.width, soilSizes.width, .1, 12);
+const labelGeo = new THREE.CylinderGeometry(.6, .6, .01, 24);
 
-const floorMaterial = new THREE.MeshStandardMaterial({ map: dirtTexture });
-floorMaterial.color = new THREE.Color(BROWN);
 
-const floorMesh = new THREE.Mesh(floorGeo, floorMaterial);
-scene.add(floorMesh);
+const soilMaterial = new THREE.MeshStandardMaterial({ map: dirtTexture });
+soilMaterial.color = new THREE.Color(BROWN);
+
+const soilMesh = new THREE.Mesh(soilGeo, soilMaterial);
+const soilMesh2 = new THREE.Mesh(soilGeo, soilMaterial);
+
+soilMesh2.scale.set(2, 2, 2);
+soilMesh2.scale.set(2, 2, 2);
+
+garden.add(soilMesh);
+garden.add(soilMesh2);
+
+
+[dirtTexture, grassTexture].forEach((texture) => {
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+});
+
+dirtTexture.repeat.set(5, 5);
+grassTexture.repeat.set(15, 15);
+
 
 let plantGroup = new THREE.Group();
-const gutter = 1.5;
+const gutter = 2;
 
-const plantGeo = new THREE.CylinderGeometry(.6, .6, 1);
+const plantGeo = new THREE.CylinderGeometry(.6, .6, 1, 24);
+
 
 const veggies = {
     tomato: {
-        height: 2.5,
+        height: 1.52,
         emoji: '🍅',
         texture: tomatoTexture,
         color: 'darkred'
     },
     corn: {
-        height: 5,
+        height: 2.44,
         emoji: '🌽',
         texture: cornTexture,
         color: 'orange',
     },
     potato: {
-        height: 3.5,
+        height: .61,
         emoji: '🥔',
         color: '#4E3524',
         texture: potatoTexture
     },  
     kale: {
-        height: 1.5,
+        height: .61,
         emoji: '🥬',
         color: 'darkgreen',
         texture: kaleTexture,
@@ -103,8 +121,9 @@ const veggies = {
 const veggieKeys = [...Object.keys(veggies)];
 
 
+
 function displayPlantsThree() {
-    scene.remove(plantGroup);
+    garden.remove(plantGroup);
     plantGroup = new THREE.Group();
 
     plants.
@@ -112,8 +131,9 @@ function displayPlantsThree() {
             [...row].reverse().forEach((plant, k) => {
                 const plantItemGroup = new THREE.Group();
                 const { texture, color, height = 0 } = veggies[plant];
+
                 const threeColor = new THREE.Color(color);
-                const plantMaterial = new THREE.MeshStandardMaterial({ color: threeColor });
+                const plantMaterial = new THREE.MeshStandardMaterial({ color: threeColor, map: texture });
                 const plantMesh = new THREE.Mesh(plantGeo, plantMaterial);
 
                 const labelMaterial = new THREE.MeshStandardMaterial({ map: texture });
@@ -121,27 +141,12 @@ function displayPlantsThree() {
                 if (plant === 'empty') labelMaterial.color = threeColor;
                 
                 const labelMesh = new THREE.Mesh(labelGeo, labelMaterial);
-
-                function onClick(clickedVeg) {
-                    const [row, col] = clickedVeg.object.rowCol;
-                    const veggieKeyIndex = veggieKeys.indexOf(plants[row][col]);
-                    const nextPlant = veggieKeys[veggieKeyIndex + 1] || veggieKeys[0];
-                    console.log(plants[row][col], 'to', nextPlant);
-                    plants[row][col] = nextPlant;
-                    displayPlantsThree();
-                }
             
-                const rowCol = [i, plants.length - 1 - k];
-
-                [labelMesh, plantMesh].forEach((mesh) => {
-                    mesh.rowCol = rowCol;
-                    mesh.onClick = onClick;
-                });
-
                 plantMesh.scale.y = height;
                 labelMesh.rotation.y = Math.PI / 2;
 
 
+                plantMesh.castShadow = true;
 
                 labelMesh.position.set(i * gutter, height + .5, k * gutter);
                 plantMesh.position.set(i * gutter, height / 2 + .5, k * gutter);
@@ -152,27 +157,166 @@ function displayPlantsThree() {
             });
         });
 
-    const offset = floorSizes.width / 2 - gutter;
-    plantGroup.position.x = floorMesh.position.x - offset;
-    plantGroup.position.z = floorMesh.position.z - offset;
+    const offset = soilSizes.width / 2;
+    plantGroup.position.x = soilMesh.position.x - offset + 2;
+    plantGroup.position.z = soilMesh.position.z - offset - 2;
 
-    scene.add(plantGroup);
+    garden.add(plantGroup);
 }
 
 displayPlantsThree();
 
-// plantGroup.position.z -= z / 2 - gutter;
 
+scene.add(garden);
+
+let cornModel;
+
+const loader = new GLTFLoader();
+
+loader.load('/models/EarOfCorn.glb', function(gltf) {
+
+    scene.add(gltf.scene);
+    const corn = gltf.scene;
+    corn.scale.set(3.2, 3.2, 3.2);
+    corn.position.set(5, 1, 1);
+
+    corn.position.set(-.6, 4.2, 15.5);
+
+    cornModel = corn;
+}, undefined, function(error) {
+
+    console.error(error);
+});
+
+let carrotModel;
+
+loader.load('/models/Carrot.glb', function(gltf) {
+
+    scene.add(gltf.scene);
+    const carrot = gltf.scene;
+    carrot.scale.set(2, 2, 2);
+    carrot.position.set(-6, 6, 9.5);
+
+
+    carrotModel = carrot;
+}, undefined, function(error) {
+
+    console.error(error);
+});
+
+let broccoliModel;
+
+loader.load('/models/Broccoli.glb', function(gltf) {
+
+    scene.add(gltf.scene);
+    const broccoli = gltf.scene;
+    broccoli.scale.set(30, 30, 30);
+    broccoli.position.set(-12, 5, -.5);
+
+
+    broccoliModel = broccoli;
+}, undefined, function(error) {
+
+    console.error(error);
+});
+
+let tomatoModel;
+
+loader.load('/models/Tomato.glb', function(gltf) {
+
+    scene.add(gltf.scene);
+    const tomato = gltf.scene;
+    tomato.scale.set(.03, .03, .03);
+    tomato.position.set(-12, 5, -9);
+
+    tomatoModel = tomato;
+}, undefined, function(error) {
+
+    console.error(error);
+});
+
+const fontLoader = new THREE.FontLoader();
+
+fontLoader.load(
+    '/fonts/helvetiker_bold.typeface.json',
+    (font) =>
+    {
+        const options = {
+            font: font,
+            size: 1,
+            height: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.03,
+            bevelSize: 0.02,
+            bevelOffset: 0,
+            bevelSegments: 5
+        };
+
+        const textGeometry = new THREE.TextGeometry(
+            'i am dani cairns', options);
+        const textMaterial = new THREE.MeshMatcapMaterial({ matcap: skyMadcap });
+        const text = new THREE.Mesh(textGeometry, textMaterial);
+
+        const textGeometry2 = new THREE.TextGeometry(
+            'i build react apps',
+            options
+        );
+        const text2 = new THREE.Mesh(textGeometry2, textMaterial);
+
+        const rotations = [0, Math.PI * .7, 0];
+        text.position.set(4.8, 4.6, 7.2);
+        text2.position.set(4.8, 3.3, 5.1);
+        text.rotation.set(...rotations);
+        text2.rotation.set(...rotations);
+        
+    
+        // text2.rotation.set(-12, 7, 0);
+
+        gui.add(text.position, 'x', -20, 20, .1).name('text');
+        gui.add(text.position, 'y', -20, 20, .1).name('text');
+        gui.add(text.position, 'z', -20, 20, .1).name('text');
+        gui.add(text.rotation, 'x', -20, 20, .01).name('text');
+        gui.add(text.rotation, 'y', -20, 20, .01).name('text');
+        gui.add(text.rotation, 'z', -20, 20, .01).name('text');
+        gui.add(text2.position, 'x', -20, 20, .1).name('text2');
+        gui.add(text2.position, 'y', -20, 20, .1).name('text2');
+        gui.add(text2.position, 'z', -20, 20, .1).name('text2');
+        gui.add(text2.rotation, 'x', -20, 20, .01).name('text2');
+        gui.add(text2.rotation, 'y', -20, 20, .01).name('text2');
+        gui.add(text2.rotation, 'z', -20, 20, .01).name('text2');
+
+        
+        const textGroup = new THREE.Group();
+        
+        const invisibleBoxGeo = new THREE.BoxGeometry(10, 4, 0);
+        const invisibleBoxMaterial = new THREE.MeshStandardMaterial({ transparent: true, opacity: 0 });
+
+        invisibleBoxMaterial.neverOpaque = true;
+        const invisibleMesh = new THREE.Mesh(invisibleBoxGeo, invisibleBoxMaterial);
+        
+        invisibleMesh.position.set(3.8, 4.6, -0.5);
+        invisibleMesh.rotation.set(...rotations);
+        textGroup.add(invisibleMesh);
+        textGroup.add(text);
+        textGroup.add(text2);
+
+        textGroup.children.forEach(child => child.onClick = () => {
+            window.open('https://dannycairns.com/DaniCairns--Resume.pdf');
+        });
+
+        scene.add(textGroup);
+    }
+);
 
 
 // Lights
-const ambientLight = new THREE.AmbientLight('white', 1);
+const ambientLight = new THREE.AmbientLight('white', .9);
 
 scene.add(ambientLight);
-const pointLight = new THREE.PointLight('white', 3, 15);
-pointLight.position.set(4.4, 1, -4);
+const pointLight = new THREE.PointLight('white', 1.2, 18);
+pointLight.position.set(4.5, 6, -4);
 scene.add(pointLight);
-
 /**
  * Sizes
  */
@@ -200,12 +344,8 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, .01, 100);
-camera.position.x = 2;
-camera.position.y = 1;
-camera.position.z = 2;
-
-camera.position.normalize().multiplyScalar(15);
+const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 100);
+camera.position.set(12.4, 5.1, -6.2);
 
 scene.add(camera);
 
@@ -219,10 +359,12 @@ controls.enableDamping = true;
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 });
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-
+renderer.setClearColor('skyblue');
 
 
 /**
@@ -240,22 +382,27 @@ function measureMouse(e) {
 
 }
 window.addEventListener('mousemove', (e) => {
-    console.log(hovered);
     measureMouse(e);
     const object = intersects[0] && intersects[0].object && intersects[0].object;
     
     if (hovered && object !== hovered) {
         hovered.parent.children.forEach((mesh) => {
-            mesh.material.opacity = 1;
-            mesh.material.transparent = false;
+            if (!mesh.material.neverOpaque) {
+                mesh.material.opacity = 1;
+                mesh.material.transparent = false;
+            }
             hovered = null;
+            document.body.style.cursor = 'default';
         });
     }
 
     if (object && object.onClick) {
         object.parent.children.forEach((mesh) => {
-            mesh.material.transparent = true;
-            mesh.material.opacity = .7;
+            if (!mesh.material.neverOpaque) {
+                mesh.material.transparent = true;
+                mesh.material.opacity = .7;    
+            }
+            document.body.style.cursor = 'pointer';
         });
         hovered = object;
     }
@@ -269,19 +416,33 @@ window.addEventListener('click', (e) => {
     }
 });
 
+const clock = new THREE.Clock();
 
-const tick = () =>
-{
+const tick = () => {
 
-
-
-    // const elapsedTime = clock.getElapsedTime();
+    const elapsedTime = clock.getElapsedTime();
 
     // Update objects
-    // boxMesh.rotation.y = .5 * elapsedTime;
+    if (cornModel) {
+        cornModel.rotation.x = -.5 * elapsedTime;
+        cornModel.rotation.z = -.5 * elapsedTime;
+    }
 
+    if (carrotModel) {
+        carrotModel.rotation.y = -.8 * elapsedTime;
+        carrotModel.rotation.z = -.8 * elapsedTime;
+    }
+
+    if (broccoliModel) {
+        broccoliModel.rotation.x = .3 * elapsedTime;
+        broccoliModel.rotation.z = .3 * elapsedTime;
+    }
+
+    if (tomatoModel) {
+        tomatoModel.rotation.x = -.9 * elapsedTime;
+        tomatoModel.rotation.z = -.9 * elapsedTime;
+    }
     // Update Orbital Controls
-    // controls.update()
 
     controls.update();
     // Render
@@ -295,6 +456,18 @@ tick();
 
 
 
-// gui.add(plantGroup.position, 'x', -10, 10, .1);
-// gui.add(plantGroup.position, 'y', -10, 10, .1);
-// gui.add(plantGroup.position, 'z', -10, 10, .1);
+// Debug
+function doRandomClick() {
+    const veggieToChangeCol = Math.floor(Math.random() * 6); // protect viewer from obstruction, no index 7
+    const veggieToChangeRow = Math.floor(Math.random() * 7);
+    const randomVeggieKey = Math.floor(Math.random() * veggieKeys.length);
+    plants[veggieToChangeCol][veggieToChangeRow] = veggieKeys[randomVeggieKey];
+
+    displayPlantsThree();
+}
+
+setInterval(doRandomClick, 50);
+
+gui.add(camera.position, 'x', -20, 20, .1);
+gui.add(camera.position, 'y', -20, 20, .1);
+gui.add(camera.position, 'z', -20, 20, .1);
