@@ -178,9 +178,8 @@ loader.load('/models/EarOfCorn.glb', function(gltf) {
     scene.add(gltf.scene);
     const corn = gltf.scene;
     corn.scale.set(3.2, 3.2, 3.2);
-    corn.position.set(5, 1, 1);
 
-    corn.position.set(-.6, 4.2, 15.5);
+    corn.position.set(-.6, 4.2, 19.5);
 
     cornModel = corn;
 }, undefined, function(error) {
@@ -195,7 +194,7 @@ loader.load('/models/Carrot.glb', function(gltf) {
     scene.add(gltf.scene);
     const carrot = gltf.scene;
     carrot.scale.set(2, 2, 2);
-    carrot.position.set(-6, 6, 9.5);
+    carrot.position.set(-5, 5, 8.5);
 
 
     carrotModel = carrot;
@@ -211,7 +210,7 @@ loader.load('/models/Broccoli.glb', function(gltf) {
     scene.add(gltf.scene);
     const broccoli = gltf.scene;
     broccoli.scale.set(30, 30, 30);
-    broccoli.position.set(-12, 5, -.5);
+    broccoli.position.set(-12, 5, -1);
 
 
     broccoliModel = broccoli;
@@ -227,7 +226,7 @@ loader.load('/models/Tomato.glb', function(gltf) {
     scene.add(gltf.scene);
     const tomato = gltf.scene;
     tomato.scale.set(.03, .03, .03);
-    tomato.position.set(-12, 5, -9);
+    tomato.position.set(-12, 5, -12);
 
     tomatoModel = tomato;
 }, undefined, function(error) {
@@ -413,7 +412,7 @@ const tick = () => {
 
     if (carrotModel) {
         carrotModel.rotation.y = -.8 * elapsedTime;
-        carrotModel.rotation.z = -.8 * elapsedTime;
+        carrotModel.rotation.z = .2 * elapsedTime;
     }
 
     if (broccoliModel) {
