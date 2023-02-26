@@ -2,74 +2,24 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import * as dat from 'dat.gui';
+import cornImg from './textures/corn.png';
+import potatoesImg from './textures/potatoes.png';
+import tomatoesImg from './textures/tomatoes.png';
+import kaleImg from './textures/kale.png';
+import dirtImg from './textures/dirt.jpg';
 
+const BROWN = '#964B00';
 
 const plants = [
     ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
-    ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
-    ['tomato', 'potato', 'corn', 'tomato', 'tomato', 'tomato', 'tomato'],
-    ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
-    ['tomato', 'tomato', 'potato', 'tomato', 'tomato', 'tomato', 'tomato'],
-    ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
-    ['tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'potato', 'potato'],
+    ['tomato', 'tomato', 'tomato', 'kale', 'kale', 'kale', 'kale'],
+    ['tomato', 'potato', 'corn', 'kale', 'kale', 'kale', 'kale'],
+    ['tomato', 'tomato', 'tomato', 'kale', 'kale', 'kale', 'kale'],
+    ['tomato', 'tomato', 'kale', 'tomato', 'tomato', 'tomato', 'tomato'],
+    ['corn', 'corn', 'corn', 'tomato', 'tomato', 'tomato', 'tomato'],
+    ['tomato', 'tomato', 'tomato', 'potato', 'potato', 'potato', 'potato'],
 
 ];
-
-const veggies = {
-    tomato: {
-        height: 2.5,
-        emoji: '🍅'
-    },
-    corn: {
-        height: 5,
-        emoji: '🌽',
-    },
-    potato: {
-        height: 3.5,
-        emoji: '🥔'
-    },   
-};
-
-const tbody = document.querySelector('tbody');
-
-function renderDropdown(plant) {
-    const selectEl = document.createElement('select');
-
-    for (let [name, dataPlant] of Object.entries(veggies)) {
-        const optionEl = document.createElement('option');
-    
-        optionEl.textContent = dataPlant.emoji;
-        optionEl.value = name;
-        
-        if (name === plant) {
-            optionEl.selected = true;
-        }
-
-        selectEl.append(optionEl);
-    }
-
-    return selectEl;
-
-}
-
-// for (let [i, row] of Object.entries(plants)) {
-//     const rowEl = document.createElement('tr');
-//     for (let [k, plant] of Object.entries(row)) {
-//         const td = document.createElement('td');
-
-//         const selectEl = renderDropdown(plant);
-
-//         selectEl.addEventListener('change', (e) => {
-//             plants[i][k] = e.target.value;
-
-//             displayPlantsThree();
-//         });
-
-//         td.append(selectEl);
-//         rowEl.append(td);
-//     }
-//     tbody.append(rowEl);
-// }
 
 // Debug
 // const gui = new dat.GUI();
@@ -88,11 +38,25 @@ const floorSizes = {
 };
 
 const floorGeo = new THREE.BoxGeometry(floorSizes.width, floorSizes.height, floorSizes.length);
+const labelGeo = new THREE.CylinderGeometry(.6, .6, .01);
+
+const textureLoader = new THREE.TextureLoader();
+
+const tomatoTexture = textureLoader.load(tomatoesImg);
+const cornTexture = textureLoader.load(cornImg);
+const potatoTexture = textureLoader.load(potatoesImg);
+const kaleTexture = textureLoader.load(kaleImg);
+const dirtTexture = textureLoader.load(dirtImg);
+const soloDirtTexture = textureLoader.load(dirtImg);
+
+dirtTexture.wrapS = THREE.RepeatWrapping;
+dirtTexture.wrapT = THREE.RepeatWrapping;
+dirtTexture.repeat.set(5, 5);
 
 // Materials
 
-const floorMaterial = new THREE.MeshStandardMaterial();
-floorMaterial.color = new THREE.Color('#964B00');
+const floorMaterial = new THREE.MeshStandardMaterial({ map: dirtTexture });
+floorMaterial.color = new THREE.Color(BROWN);
 
 const floorMesh = new THREE.Mesh(floorGeo, floorMaterial);
 scene.add(floorMesh);
@@ -100,10 +64,45 @@ scene.add(floorMesh);
 let plantGroup = new THREE.Group();
 const gutter = 1.5;
 
-const plantMaterial = new THREE.MeshStandardMaterial({ color: 'green' });
-const plantGeo = new THREE.BoxGeometry(1, 1, 1);
+const plantGeo = new THREE.CylinderGeometry(.6, .6, 1);
 
-const veggieKeys = Object.keys(veggies);
+const veggies = {
+    tomato: {
+        height: 2.5,
+        emoji: '🍅',
+        texture: tomatoTexture,
+        color: 'darkred'
+    },
+    corn: {
+        height: 5,
+        emoji: '🌽',
+        texture: cornTexture,
+        color: 'orange',
+    },
+    potato: {
+        height: 3.5,
+        emoji: '🥔',
+        color: '#4E3524',
+        texture: potatoTexture
+    },  
+    kale: {
+        height: 1.5,
+        emoji: '🥬',
+        color: 'darkgreen',
+        texture: kaleTexture,
+    },    
+    empty: {
+        height: 0,
+        emoji: '🪱',
+        texture: soloDirtTexture,
+        color: BROWN
+    }
+};
+
+
+const veggieKeys = [...Object.keys(veggies)];
+
+
 function displayPlantsThree() {
     scene.remove(plantGroup);
     plantGroup = new THREE.Group();
@@ -111,27 +110,48 @@ function displayPlantsThree() {
     plants.
         forEach((row, i) => {
             [...row].reverse().forEach((plant, k) => {
-                const plantHeight = veggies[plant].height;
+                const plantItemGroup = new THREE.Group();
+                const { texture, color, height = 0 } = veggies[plant];
+                const threeColor = new THREE.Color(color);
+                const plantMaterial = new THREE.MeshStandardMaterial({ color: threeColor });
                 const plantMesh = new THREE.Mesh(plantGeo, plantMaterial);
-                plantMesh.scale.y = plantHeight;
-                plantMesh.veggieTuple = [i, plants.length - 1 - k];
-                plantMesh.onClick = (clickedVeg) => {
-                    const [row, col] = clickedVeg.object.veggieTuple;
+
+                const labelMaterial = new THREE.MeshStandardMaterial({ map: texture });
+
+                if (plant === 'empty') labelMaterial.color = threeColor;
+                
+                const labelMesh = new THREE.Mesh(labelGeo, labelMaterial);
+
+                function onClick(clickedVeg) {
+                    const [row, col] = clickedVeg.object.rowCol;
                     const veggieKeyIndex = veggieKeys.indexOf(plants[row][col]);
                     const nextPlant = veggieKeys[veggieKeyIndex + 1] || veggieKeys[0];
-                    console.log(nextPlant);
+                    console.log(plants[row][col], 'to', nextPlant);
                     plants[row][col] = nextPlant;
                     displayPlantsThree();
-                };
-            // distance from middle to bottom is half of height
-                plantMesh.position.set(i * gutter, plantHeight / 2 + .5, k * gutter);
+                }
+            
+                const rowCol = [i, plants.length - 1 - k];
 
-                plantGroup.add(plantMesh);
+                [labelMesh, plantMesh].forEach((mesh) => {
+                    mesh.rowCol = rowCol;
+                    mesh.onClick = onClick;
+                });
+
+                plantMesh.scale.y = height;
+                labelMesh.rotation.y = Math.PI / 2;
+
+
+
+                labelMesh.position.set(i * gutter, height + .5, k * gutter);
+                plantMesh.position.set(i * gutter, height / 2 + .5, k * gutter);
+
+                plantItemGroup.add(plantMesh);
+                plantItemGroup.add(labelMesh);
+                plantGroup.add(plantItemGroup);
             });
         });
 
-// const boundingBox = new THREE.Box3().setFromObject(plantGroup);
-// const { x, z } = boundingBox.getSize();
     const offset = floorSizes.width / 2 - gutter;
     plantGroup.position.x = floorMesh.position.x - offset;
     plantGroup.position.z = floorMesh.position.z - offset;
@@ -211,22 +231,40 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let intersects = [];
+let hovered = null;
 
-window.addEventListener('pointermove', detectMouse);
-
-function detectMouse(e) {
+function measureMouse(e) {
     mouse.set((e.clientX / sizes.width) * 2 - 1, -(e.clientY / sizes.height) * 2 + 1);
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);
+
 }
+window.addEventListener('mousemove', (e) => {
+    console.log(hovered);
+    measureMouse(e);
+    const object = intersects[0] && intersects[0].object && intersects[0].object;
+    
+    if (hovered && object !== hovered) {
+        hovered.parent.children.forEach((mesh) => {
+            mesh.material.opacity = 1;
+            mesh.material.transparent = false;
+            hovered = null;
+        });
+    }
+
+    if (object && object.onClick) {
+        object.parent.children.forEach((mesh) => {
+            mesh.material.transparent = true;
+            mesh.material.opacity = .7;
+        });
+        hovered = object;
+    }
+});
 
 window.addEventListener('click', (e) => {
-      // Call onClick
+    measureMouse(e);
     const clickedOn = intersects[0];
-    console.log(clickedOn);
-
     if (clickedOn && clickedOn && clickedOn.object && clickedOn.object.onClick) {
-        detectMouse(e);
         clickedOn.object.onClick(clickedOn);
     }
 });
