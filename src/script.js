@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as dat from 'dat.gui';
 
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 
 const BROWN = '#964B00';
 
@@ -270,23 +270,6 @@ fontLoader.load(
         text.rotation.set(...rotations);
         text2.rotation.set(...rotations);
         
-    
-        // text2.rotation.set(-12, 7, 0);
-
-        gui.add(text.position, 'x', -20, 20, .1).name('text');
-        gui.add(text.position, 'y', -20, 20, .1).name('text');
-        gui.add(text.position, 'z', -20, 20, .1).name('text');
-        gui.add(text.rotation, 'x', -20, 20, .01).name('text');
-        gui.add(text.rotation, 'y', -20, 20, .01).name('text');
-        gui.add(text.rotation, 'z', -20, 20, .01).name('text');
-        gui.add(text2.position, 'x', -20, 20, .1).name('text2');
-        gui.add(text2.position, 'y', -20, 20, .1).name('text2');
-        gui.add(text2.position, 'z', -20, 20, .1).name('text2');
-        gui.add(text2.rotation, 'x', -20, 20, .01).name('text2');
-        gui.add(text2.rotation, 'y', -20, 20, .01).name('text2');
-        gui.add(text2.rotation, 'z', -20, 20, .01).name('text2');
-
-        
         const textGroup = new THREE.Group();
         
         const invisibleBoxGeo = new THREE.BoxGeometry(10, 4, 0);
@@ -467,7 +450,3 @@ function doRandomClick() {
 }
 
 setInterval(doRandomClick, 50);
-
-gui.add(camera.position, 'x', -20, 20, .1);
-gui.add(camera.position, 'y', -20, 20, .1);
-gui.add(camera.position, 'z', -20, 20, .1);
