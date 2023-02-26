@@ -194,7 +194,8 @@ loader.load('/models/Carrot.glb', function(gltf) {
     scene.add(gltf.scene);
     const carrot = gltf.scene;
     carrot.scale.set(2, 2, 2);
-    carrot.position.set(-5, 5, 8.5);
+    carrot.rotation.set(-1.5, 0, 0);
+    carrot.position.set(-5, 7, 8.5);
 
 
     carrotModel = carrot;
@@ -264,7 +265,7 @@ fontLoader.load(
         const text2 = new THREE.Mesh(textGeometry2, textMaterial);
 
         const rotations = [0, Math.PI * .7, 0];
-        text.position.set(4.8, 4.6, 7.2);
+        text.position.set(5.8, 4.6, 7.2);
         text2.position.set(4.8, 3.3, 5.1);
         text.rotation.set(...rotations);
         text2.rotation.set(...rotations);
@@ -411,7 +412,7 @@ const tick = () => {
     }
 
     if (carrotModel) {
-        carrotModel.rotation.y = -.8 * elapsedTime;
+        carrotModel.rotation.y = .8 * elapsedTime;
         carrotModel.rotation.z = .2 * elapsedTime;
     }
 
