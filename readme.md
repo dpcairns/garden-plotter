@@ -26,3 +26,5 @@ Broccoli by Jarlan Perez [CC-BY] (https://creativecommons.org/licenses/by/3.0/) 
 Ear of corn by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/3zsUEPnTdFt)
 
 Tomato by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/0vxjCVR_euD)
+
+Valley Terrain by Zsky [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/u78ByZHYB2)

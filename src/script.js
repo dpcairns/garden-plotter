@@ -2,9 +2,24 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import * as dat from 'dat.gui';
+// import * as dat from 'dat.gui';
+import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
 
 // const gui = new dat.GUI();
+
+function tweenTo(mesh, xyz, delay = 1000, fromRight = false, fromBelow = false) {
+    mesh.position.set(
+        0, fromBelow ? -3 : 20, 
+        fromBelow ? 0 : fromRight ? -50 : 50
+    );
+
+    new TWEEN.Tween(mesh.position)
+        .to(xyz, 500)
+        .delay(delay)
+        .easing(TWEEN.Easing.Cubic.Out)
+        //.onUpdate(() => render())
+        .start();
+}
 
 const BROWN = '#964B00';
 
@@ -15,10 +30,13 @@ const plants = [
     ['tomato', 'tomato', 'tomato', 'kale', 'kale', 'kale', 'kale'],
     ['tomato', 'tomato', 'kale', 'tomato', 'tomato', 'tomato', 'tomato'],
     ['corn', 'corn', 'corn', 'tomato', 'tomato', 'tomato', 'tomato'],
-    ['tomato', 'tomato', 'tomato', 'potato', 'potato', 'potato', 'potato'],
+    ['corn', 'potato', 'potato', 'potato', 'kale', 'kale', 'kale'],
 ];
 
-const textureLoader = new THREE.TextureLoader();
+
+const manager = new THREE.LoadingManager();
+
+const textureLoader = new THREE.TextureLoader(manager);
 
 // Scene
 const scene = new THREE.Scene();
@@ -66,7 +84,7 @@ soilMesh2.scale.set(2, 2, 2);
 soilMesh2.scale.set(2, 2, 2);
 
 garden.add(soilMesh);
-garden.add(soilMesh2);
+scene.add(soilMesh2);
 
 
 [dirtTexture, grassTexture].forEach((texture) => {
@@ -167,7 +185,13 @@ function displayPlantsThree() {
 displayPlantsThree();
 
 
-scene.add(garden);
+manager.onLoad = () => {
+    scene.add(garden);
+
+    tweenTo(garden, { x: 0, y: 0, z: 0 }, 1500, true, true);
+};
+
+
 
 let cornModel;
 
@@ -179,9 +203,36 @@ loader.load('/models/EarOfCorn.glb', function(gltf) {
     const corn = gltf.scene;
     corn.scale.set(3.2, 3.2, 3.2);
 
-    corn.position.set(-.6, 4.2, 19.5);
+    tweenTo(corn, {
+        x: -17,
+        y: 5,
+        z: -12
+    }, 50, true);
 
     cornModel = corn;
+}, undefined, function(error) {
+
+    console.error(error);
+});
+
+
+loader.load('/models/Mountains.glb', function(gltf) {
+
+    const children = [...gltf.scene.children];
+    for (const child of children) {
+        scene.add(child);
+
+        child.scale.set(.4, .4, .7);
+        child.rotation.set(0, -48.4, 0);
+        child.position.set(-100,
+            -11.5,
+            47); 
+            
+    }   
+
+    
+
+    // mountainsModel = mountains;
 }, undefined, function(error) {
 
     console.error(error);
@@ -195,8 +246,12 @@ loader.load('/models/Carrot.glb', function(gltf) {
     const carrot = gltf.scene;
     carrot.scale.set(2, 2, 2);
     carrot.rotation.set(-1.5, 0, 0);
-    carrot.position.set(-5, 7, 8.5);
 
+    tweenTo(carrot, {
+        x: -5,
+        y: 7,
+        z: 8.5
+    }, 400);
 
     carrotModel = carrot;
 }, undefined, function(error) {
@@ -211,8 +266,12 @@ loader.load('/models/Broccoli.glb', function(gltf) {
     scene.add(gltf.scene);
     const broccoli = gltf.scene;
     broccoli.scale.set(30, 30, 30);
-    broccoli.position.set(-12, 5, -1);
 
+    tweenTo(broccoli, {
+        x: -12,
+        y: 5,
+        z: -1
+    }, 700, true);
 
     broccoliModel = broccoli;
 }, undefined, function(error) {
@@ -227,7 +286,12 @@ loader.load('/models/Tomato.glb', function(gltf) {
     scene.add(gltf.scene);
     const tomato = gltf.scene;
     tomato.scale.set(.03, .03, .03);
-    tomato.position.set(-12, 5, -12);
+    
+    tweenTo(tomato, {
+        x: -2,
+        y: 4.2,
+        z: 19.5
+    }, 1000);
 
     tomatoModel = tomato;
 }, undefined, function(error) {
@@ -254,19 +318,19 @@ fontLoader.load(
         };
 
         const textGeometry = new THREE.TextGeometry(
-            'i am dani cairns', options);
+            'Dani Cairns', options);
         const textMaterial = new THREE.MeshMatcapMaterial({ matcap: skyMadcap });
         const text = new THREE.Mesh(textGeometry, textMaterial);
 
         const textGeometry2 = new THREE.TextGeometry(
-            'i build react apps',
+            'Web Developer',
             options
         );
         const text2 = new THREE.Mesh(textGeometry2, textMaterial);
 
         const rotations = [0, Math.PI * .7, 0];
-        text.position.set(5.8, 4.6, 7.2);
-        text2.position.set(4.8, 3.3, 5.1);
+        text.position.set(5.8, 4.6, 6.2);
+        text2.position.set(4.8, 3.3, 4.1);
         text.rotation.set(...rotations);
         text2.rotation.set(...rotations);
         
@@ -292,12 +356,14 @@ fontLoader.load(
     }
 );
 
+// scene.fog = new THREE.Fog('#4E3524', 50, 125);
 
 // Lights
-const ambientLight = new THREE.AmbientLight('white', .9);
+const ambientLight = new THREE.AmbientLight('white', 1);
 
 scene.add(ambientLight);
-const pointLight = new THREE.PointLight('white', 1.2, 18);
+const pointLight = new THREE.PointLight('white', 1, 18);
+
 pointLight.position.set(4.5, 6, -4);
 scene.add(pointLight);
 /**
@@ -327,8 +393,8 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 100);
-camera.position.set(12.4, 5.1, -6.2);
+const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 1000);
+camera.position.set(12.4, 4.1, -5.2);
 
 scene.add(camera);
 
@@ -346,8 +412,6 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 });
 
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor('skyblue');
@@ -430,6 +494,7 @@ const tick = () => {
     }
     // Update Orbital Controls
 
+    TWEEN.update();
     controls.update();
     // Render
     renderer.render(scene, camera);
@@ -439,7 +504,6 @@ const tick = () => {
 };
 
 tick();
-
 
 
 // Debug
