@@ -417,10 +417,10 @@ fontLoader.load(
 
 
 // Lights
-const ambientLight = new THREE.AmbientLight('white', 1);
+const ambientLight = new THREE.AmbientLight('white', .9);
 
 
-const pointLight = new THREE.PointLight('white', 1, 18);
+const pointLight = new THREE.PointLight('white', 1.2, 18);
 
 pointLight.position.set(4.5, 6, -4);
 
