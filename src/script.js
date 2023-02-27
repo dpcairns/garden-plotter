@@ -4,10 +4,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 // import * as dat from 'dat.gui';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
-import { convertArray } from 'three/src/animation/AnimationUtils';
-import { LoadingManager } from 'three';
 
 // const gui = new dat.GUI();
+
+// spinners from of https://loading.io/
+const loadingSplash = document.querySelector('.loading');
+const loadingImg = document.createElement('img');
+loadingImg.src = 'spinner.gif';
+loadingSplash.append(loadingImg);
 
 const MOBILE_WIDTH = 600;
 
@@ -251,7 +255,7 @@ function displayPlantsThree() {
 
 
 
-tweenTo(garden, { x: 0, y: 0, z: 0 }, 1500, true, true);
+
 
 
 displayPlantsThree();
@@ -266,7 +270,7 @@ loader.load('/models/EarOfCorn.glb', function(gltf) {
     const corn = gltf.scene;
     corn.scale.set(3.2, 3.2, 3.2);
 
-    tweenTo(corn, modelPositions.corn, 50, true);
+    
 
     cornModel = corn;
 }, undefined, function(error) {
@@ -314,14 +318,9 @@ loader.load('/models/Mountains.glb', function(gltf) {
 let carrotModel;
 
 loader.load('/models/Carrot.glb', function(gltf) {
-
- 
     const carrot = gltf.scene;
     carrot.scale.set(2, 2, 2);
     carrot.rotation.set(-1.5, 0, 0);
-
-    tweenTo(carrot, modelPositions.carrot, 400);
-
 
     carrotModel = carrot;
 }, undefined, function(error) {
@@ -330,14 +329,13 @@ loader.load('/models/Carrot.glb', function(gltf) {
 });
 
 let broccoliModel;
-
 loader.load('/models/Broccoli.glb', function(gltf) {
 
  
     const broccoli = gltf.scene;
     broccoli.scale.set(30, 30, 30);
 
-    tweenTo(broccoli, modelPositions.broccoli, 700, true);
+    
 
 
     broccoliModel = broccoli;
@@ -354,7 +352,7 @@ loader.load('/models/Tomato.glb', function(gltf) {
     const tomato = gltf.scene;
     tomato.scale.set(.03, .03, .03);
     
-    tweenTo(tomato, modelPositions.tomato, 1000);
+    
 
 
     tomatoModel = tomato;
@@ -364,6 +362,8 @@ loader.load('/models/Tomato.glb', function(gltf) {
 });
 
 const fontLoader = new THREE.FontLoader();
+
+let textGroup;
 
 fontLoader.load(
     '/fonts/optimer_regular.typeface.json',
@@ -400,7 +400,7 @@ fontLoader.load(
         text.geometry.center();
         text2.geometry.center();
 
-        const textGroup = new THREE.Group();
+        textGroup = new THREE.Group();
         
         const invisibleBoxGeo = new THREE.BoxGeometry(sizes.width < 600 ? 4 : 5.8, 1.8, .5);
         const invisibleBoxMaterial = new THREE.MeshStandardMaterial({ color: 'black', transparent: true, opacity: .75 });
@@ -425,9 +425,9 @@ fontLoader.load(
         textGroup.add(text);
         textGroup.add(text2);
         
+        console.log(textGroup.position);
         textGroup.children.forEach(child => child.onClick = navigateToResume);
 
-        scene.add(textGroup);
     }
 );
 
@@ -447,7 +447,7 @@ pointLight.position.set(4.5, 6, -4);
 // Base camera
 const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 1000);
 
-if (isMobile())camera.position.set(17, 2.8, -6.5);
+if (isMobile())camera.position.set(22, 2.8, -6.5);
 else camera.position.set(13, 2, -4.8);
 
 
@@ -531,18 +531,21 @@ window.addEventListener('touchend', () => {
 
 
 manager.onLoad = () => {
+
+    loadingSplash.classList.add('hide');
     scene.add(soilMesh);
     scene.add(soilMesh2);
     scene.add(grassMesh);
     scene.add(garden);
     scene.add(cornModel);
-    scene.add(convertArray);
     scene.add(tomatoModel);
     scene.add(broccoliModel);
+    scene.add(carrotModel);
     scene.add(ambientLight);
     scene.add(pointLight);
     scene.add(camera);
     scene.add(farmModel);
+    scene.add(textGroup);
     for (let i = 0; i < 70; i++) {
         const cow = firstCow.clone();
         cow.scale.set(.3, .3, .3);
@@ -576,6 +579,12 @@ manager.onLoad = () => {
         scene.add(child);  
     }   
 
+    tweenTo(garden, { x: 0, y: 0, z: 0 }, 1500, true, true);
+    tweenTo(cornModel, modelPositions.corn, 800, true);
+    tweenTo(carrotModel, modelPositions.carrot, 400);
+    tweenTo(broccoliModel, modelPositions.broccoli, 700, true);
+    tweenTo(tomatoModel, modelPositions.tomato, 1000);
+    tweenTo(textGroup, { x: 0, y: 0, z: 0 }, 1000);
 };
 
 const clock = new THREE.Clock();
@@ -584,7 +593,6 @@ const randoms = Array(4).fill(null).map(() => Math.random() * -.6);
 
 const tick = () => {
     const models = [cornModel, carrotModel, broccoliModel, tomatoModel];
-
 
     const elapsedTime = clock.getElapsedTime();
 
