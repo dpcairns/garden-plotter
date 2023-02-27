@@ -2,12 +2,66 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import * as dat from 'dat.gui';
+// import * as dat from 'dat.gui';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
 
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 
 const MOBILE_WIDTH = 600;
+
+/**
+ * Sizes
+ */
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+};
+
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth;
+    sizes.height = window.innerHeight;
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix();
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+
+function isMobile() {
+    return sizes.width < MOBILE_WIDTH;
+}
+
+const modelPositions = {
+    tomato: {
+        x: -17,
+        y: 6.3,
+        z: -13
+    },
+    carrot: {
+        x: -12,
+        y: 10,
+        z: -1
+    },
+    corn: {
+        x: -2,
+        y: 6.2,
+        z: 19.5
+    },
+    broccoli: {
+        x: -5,
+        y: 7,
+        z: isMobile() ? 5.5 : 8.5
+    }
+};
+
+
+
 
 function navigateToResume() {
     window.open('https://dannycairns.com/DaniCairns--Resume.pdf');
@@ -38,7 +92,7 @@ const BROWN = '#964B00';
 const plants = [
     ['kale', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato', 'tomato'],
     ['tomato', 'tomato', 'tomato', 'kale', 'kale', 'kale', 'kale'],
-    ['tomato', 'potato', 'corn', 'kale', 'kale', 'kale', 'kale'],
+    ['tomato', 'potato', 'kale', 'kale', 'kale', 'kale', 'kale'],
     ['tomato', 'tomato', 'tomato', 'kale', 'kale', 'kale', 'kale'],
     ['tomato', 'tomato', 'kale', 'tomato', 'tomato', 'tomato', 'tomato'],
     ['corn', 'corn', 'corn', 'tomato', 'tomato', 'tomato', 'tomato'],
@@ -215,11 +269,7 @@ loader.load('/models/EarOfCorn.glb', function(gltf) {
     const corn = gltf.scene;
     corn.scale.set(3.2, 3.2, 3.2);
 
-    tweenTo(corn, {
-        x: -17,
-        y: 5,
-        z: -12
-    }, 50, true);
+    tweenTo(corn, modelPositions.corn, 50, true);
 
     cornModel = corn;
 }, undefined, function(error) {
@@ -306,11 +356,8 @@ loader.load('/models/Carrot.glb', function(gltf) {
     carrot.scale.set(2, 2, 2);
     carrot.rotation.set(-1.5, 0, 0);
 
-    tweenTo(carrot, {
-        x: -5,
-        y: 7,
-        z: 8.5
-    }, 400);
+    tweenTo(carrot, modelPositions.carrot, 400);
+
 
     carrotModel = carrot;
 }, undefined, function(error) {
@@ -326,11 +373,8 @@ loader.load('/models/Broccoli.glb', function(gltf) {
     const broccoli = gltf.scene;
     broccoli.scale.set(30, 30, 30);
 
-    tweenTo(broccoli, {
-        x: -12,
-        y: 5,
-        z: -1
-    }, 700, true);
+    tweenTo(broccoli, modelPositions.broccoli, 700, true);
+
 
     broccoliModel = broccoli;
 }, undefined, function(error) {
@@ -346,11 +390,8 @@ loader.load('/models/Tomato.glb', function(gltf) {
     const tomato = gltf.scene;
     tomato.scale.set(.03, .03, .03);
     
-    tweenTo(tomato, {
-        x: -2,
-        y: 4.2,
-        z: 19.5
-    }, 1000);
+    tweenTo(tomato, modelPositions.tomato, 1000);
+
 
     tomatoModel = tomato;
 }, undefined, function(error) {
@@ -366,7 +407,7 @@ fontLoader.load(
     {
         const options = {
             font: font,
-            size:sizes.width < MOBILE_WIDTH ? .4 : .5,
+            size: isMobile() ? .4 : .5,
             height: 0.2,
             curveSegments: 12,
             bevelEnabled: true,
@@ -398,7 +439,7 @@ fontLoader.load(
         const textGroup = new THREE.Group();
         
         const invisibleBoxGeo = new THREE.BoxGeometry(sizes.width < 600 ? 4 : 5.8, 1.8, .5);
-        const invisibleBoxMaterial = new THREE.MeshStandardMaterial({ color: 'black', transparent: true, opacity: .85 });
+        const invisibleBoxMaterial = new THREE.MeshStandardMaterial({ color: 'black', transparent: true, opacity: .75 });
 
         invisibleBoxMaterial.neverOpaque = true;
         const invisibleMesh = new THREE.Mesh(invisibleBoxGeo, invisibleBoxMaterial);
@@ -406,14 +447,14 @@ fontLoader.load(
         invisibleMesh.rotation.set(...rotations);
 
 
-        if (sizes.width < MOBILE_WIDTH){
+        if (isMobile()){
             text.position.set(12, 1.5, -4);
             text2.position.set(12, .8, -4.4); 
             invisibleMesh.position.set(11.5, 1.1, -4.3);   
         } else {
-            text.position.set(9, 2.4, -3.8);
-            text2.position.set(9, 1.6, -4); 
-            invisibleMesh.position.set(8.5, 2., -3.8);
+            text.position.set(9, 2.4 + .25, -3.8);
+            text2.position.set(9, 1.6 + .25, -4); 
+            invisibleMesh.position.set(8.5, 2. + .25, -3.8);
         }
 
         textGroup.add(invisibleMesh);
@@ -436,28 +477,6 @@ const pointLight = new THREE.PointLight('white', 1, 18);
 
 pointLight.position.set(4.5, 6, -4);
 scene.add(pointLight);
-/**
- * Sizes
- */
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-};
-
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth;
-    sizes.height = window.innerHeight;
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height;
-    camera.updateProjectionMatrix();
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
 
 /**
  * Camera
@@ -465,7 +484,7 @@ window.addEventListener('resize', () =>
 // Base camera
 const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 1000);
 
-if (sizes.width < MOBILE_WIDTH)camera.position.set(17, 2.8, -6.5);
+if (isMobile())camera.position.set(17, 2.8, -6.5);
 else camera.position.set(13, 2, -4.8);
 
 scene.add(camera);
@@ -474,7 +493,7 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.maxPolarAngle = Math.PI * .455; 
-controls.minDistance = 2;
+controls.minDistance = 14.5;
 controls.maxDistance = 30;
 
 /**
@@ -549,30 +568,26 @@ window.addEventListener('touchend', () => {
 
 const clock = new THREE.Clock();
 
+
+const randoms = Array(4).fill(null).map(() => Math.random() * -.6);
+
 const tick = () => {
+    const models = [cornModel, carrotModel, broccoliModel, tomatoModel];
+
 
     const elapsedTime = clock.getElapsedTime();
 
+
+    if (models.every(model => !!model)) {
+        models.forEach((model, i) => {
+            const factor = Math.abs(randoms[i]) < .25 ? .25 : randoms[i];
+            model.rotation.x = factor * elapsedTime;
+            model.rotation.z = factor * elapsedTime;
+        });
+    }
     // Update objects
-    if (cornModel) {
-        cornModel.rotation.x = -.5 * elapsedTime;
-        cornModel.rotation.z = -.5 * elapsedTime;
-    }
 
-    if (carrotModel) {
-        carrotModel.rotation.y = .8 * elapsedTime;
-        carrotModel.rotation.z = .2 * elapsedTime;
-    }
-
-    if (broccoliModel) {
-        broccoliModel.rotation.x = .3 * elapsedTime;
-        broccoliModel.rotation.z = .3 * elapsedTime;
-    }
-
-    if (tomatoModel) {
-        tomatoModel.rotation.x = -.9 * elapsedTime;
-        tomatoModel.rotation.z = -.9 * elapsedTime;
-    }
+    
     // Update Orbital Controls
 
     TWEEN.update();
@@ -589,7 +604,7 @@ tick();
 
 // Debug
 function doRandomClick() {
-    const veggieToChangeCol = Math.floor(Math.random() * 6); // protect viewer from obstruction, no index 7
+    const veggieToChangeCol = Math.floor(Math.random() * 7); // protect viewer from obstruction, no index 7
     const veggieToChangeRow = Math.floor(Math.random() * 7);
     const randomVeggieKey = Math.floor(Math.random() * veggieKeys.length);
     plants[veggieToChangeCol][veggieToChangeRow] = veggieKeys[randomVeggieKey];
@@ -598,10 +613,3 @@ function doRandomClick() {
 }
 
 setInterval(doRandomClick, 50);
-
-gui.add(camera.position, 'x', -20, 20);
-gui.add(camera.position, 'y', -20, 20);
-gui.add(camera.position, 'z', -20, 20);
-gui.add(camera.rotation, 'x', -20, 20);
-gui.add(camera.rotation, 'y', -20, 20);
-gui.add(camera.rotation, 'z', -20, 20);
