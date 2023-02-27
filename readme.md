@@ -17,16 +17,20 @@ npm run build
 ```
 
 
-Veggie Model Attributions:
+## Asset Attributions
 
-Carrot by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/3oFkNid6ofx)
+*Carrot by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/3oFkNid6ofx)
 
-Broccoli by Jarlan Perez [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/bCmu5O24_Jv)
+*Broccoli by Jarlan Perez* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/bCmu5O24_Jv)
 
-Ear of corn by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/3zsUEPnTdFt)
+Ear of *corn by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/3zsUEPnTdFt)
 
-Tomato by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/0vxjCVR_euD)
+*Tomato by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/0vxjCVR_euD)
 
-Valley Terrain by Zsky [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/u78ByZHYB2)
+*Valley Terrain by Zsky* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/u78ByZHYB2)
 
-Cow by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/0OToIgkcVM7)
+*Cow by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/0OToIgkcVM7)
+
+Textures from pixabay
+
+[Matcaps from nidorx](https://github.com/nidorx/matcaps)
