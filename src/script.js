@@ -426,33 +426,6 @@ pointLight.position.set(4.5, 6, -4);
 
 
 let hasClicked = false;
-
-window.addEventListener('click', () => {
-    if (!hasClicked) {
-        new TWEEN.Tween(camera.position)
-            // .to({ x: 22, y: 2.8, z: -6.5 }, 500)
-            .to({ x: 8.7, y: 6.8, z: -14 }, 500)
-
-            .easing(TWEEN.Easing.Cubic.Out)
-    //.onUpdate(() => render())
-            .start();
-    }
-
-    hasClicked = true;
-});
-
-window.addEventListener('touchend', () => {
-    if (!hasClicked) {
-        new TWEEN.Tween(camera.position)
-            .to({ x: 10, y: 5, z: -10 }, 500)
-            .easing(TWEEN.Easing.Cubic.Out)
-    //.onUpdate(() => render())
-            .start();
-    }
-
-    hasClicked = true;
-});
-
 /**
  * Camera
  */
@@ -537,6 +510,33 @@ window.addEventListener('click', (e) => {
 
 
 manager.onLoad = () => {
+
+    window.addEventListener('click', () => {
+        if (!hasClicked) {
+            new TWEEN.Tween(camera.position)
+            // .to({ x: 22, y: 2.8, z: -6.5 }, 500)
+                .to({ x: 8.7, y: 6.8, z: -14 }, 500)
+
+                .easing(TWEEN.Easing.Cubic.Out)
+    //.onUpdate(() => render())
+                .start();
+        }
+
+        hasClicked = true;
+    });
+
+    window.addEventListener('touchend', () => {
+        if (!hasClicked) {
+            new TWEEN.Tween(camera.position)
+                .to({ x: 10, y: 5, z: -10 }, 500)
+                .easing(TWEEN.Easing.Cubic.Out)
+    //.onUpdate(() => render())
+                .start();
+        }
+
+        hasClicked = true;
+    });
+
     document.body.style.cursor = 'grab';
     window.addEventListener('pointerdown', () => {
         document.body.style.cursor = 'grabbing';
