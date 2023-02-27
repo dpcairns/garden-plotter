@@ -7,11 +7,6 @@ import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
 
 // const gui = new dat.GUI();
 
-// spinners from of https://loading.io/
-const loadingSplash = document.querySelector('.loading');
-const loadingImg = document.createElement('img');
-loadingImg.src = 'spinner.gif';
-loadingSplash.append(loadingImg);
 
 const MOBILE_WIDTH = 600;
 
@@ -66,13 +61,6 @@ const modelPositions = {
     }
 };
 
-
-
-
-function navigateToResume() {
-    window.open('https://dannycairns.com/DaniCairns--Resume.pdf');
-}
-
 function tweenTo(mesh, xyz, delay = 1000, fromRight = false, fromBelow = false) {
     mesh.position.set(
         0, fromBelow 
@@ -118,10 +106,8 @@ const canvas = document.querySelector('canvas.webgl');
 const grassTexture = textureLoader.load('/textures/grass.jpg');
 const grassGeo = new THREE.CylinderGeometry(120, .6, .01, 24);
 
-const grassMaterial = new THREE.MeshStandardMaterial({ map: grassTexture, color: 'green' });
+const grassMaterial = new THREE.MeshStandardMaterial({ map: grassTexture, color: '#4CBB17' });
 const grassMesh = new THREE.Mesh(grassGeo, grassMaterial);
-
-
 
 const garden = new THREE.Group();
 // Objects
@@ -426,8 +412,6 @@ fontLoader.load(
         textGroup.add(text2);
         
         console.log(textGroup.position);
-        textGroup.children.forEach(child => child.onClick = navigateToResume);
-
     }
 );
 
@@ -440,6 +424,34 @@ const pointLight = new THREE.PointLight('white', 1, 18);
 
 pointLight.position.set(4.5, 6, -4);
 
+
+let hasClicked = false;
+
+window.addEventListener('click', () => {
+    if (!hasClicked) {
+        new TWEEN.Tween(camera.position)
+            // .to({ x: 22, y: 2.8, z: -6.5 }, 500)
+            .to({ x: 8.7, y: 6.8, z: -14 }, 500)
+
+            .easing(TWEEN.Easing.Cubic.Out)
+    //.onUpdate(() => render())
+            .start();
+    }
+
+    hasClicked = true;
+});
+
+window.addEventListener('touchend', () => {
+    if (!hasClicked) {
+        new TWEEN.Tween(camera.position)
+            .to({ x: 10, y: 5, z: -10 }, 500)
+            .easing(TWEEN.Easing.Cubic.Out)
+    //.onUpdate(() => render())
+            .start();
+    }
+
+    hasClicked = true;
+});
 
 /**
  * Camera
@@ -521,18 +533,19 @@ window.addEventListener('click', (e) => {
 
 });
 
-let hasVisitedResume = false;
-window.addEventListener('touchend', () => {
-    if (!hasVisitedResume){ navigateToResume();
-        hasVisitedResume = true;
-    }
-}, false);
 
 
 
 manager.onLoad = () => {
-
-    loadingSplash.classList.add('hide');
+    document.body.style.cursor = 'grab';
+    window.addEventListener('pointerdown', () => {
+        document.body.style.cursor = 'grabbing';
+    });
+    
+    window.addEventListener('pointerup', () => {
+        document.body.style.cursor = 'grab';
+    });
+    document.querySelector('.loading').classList.add('hide');
     scene.add(soilMesh);
     scene.add(soilMesh2);
     scene.add(grassMesh);
@@ -621,6 +634,7 @@ const tick = () => {
 tick();
 
 
+
 // Debug
 function doRandomClick() {
     const veggieToChangeCol = Math.floor(Math.random() * 7); // protect viewer from obstruction, no index 7
@@ -629,6 +643,7 @@ function doRandomClick() {
     plants[veggieToChangeCol][veggieToChangeRow] = veggieKeys[randomVeggieKey];
 
     displayPlantsThree();
+
 }
 
 setInterval(doRandomClick, 50);
