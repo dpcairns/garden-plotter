@@ -28,3 +28,5 @@ Ear of corn by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3
 Tomato by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/0vxjCVR_euD)
 
 Valley Terrain by Zsky [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/u78ByZHYB2)
+
+Cow by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/0OToIgkcVM7)

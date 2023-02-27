@@ -2,15 +2,27 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import * as dat from 'dat.gui';
+import * as dat from 'dat.gui';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
 
-// const gui = new dat.GUI();
+const gui = new dat.GUI();
+
+const MOBILE_WIDTH = 600;
+
+function navigateToResume() {
+    window.open('https://dannycairns.com/DaniCairns--Resume.pdf');
+}
 
 function tweenTo(mesh, xyz, delay = 1000, fromRight = false, fromBelow = false) {
     mesh.position.set(
-        0, fromBelow ? -3 : 20, 
-        fromBelow ? 0 : fromRight ? -50 : 50
+        0, fromBelow 
+            ? -3
+            : 20, 
+        fromBelow 
+            ? 0 
+            : fromRight 
+                ? -50 
+                : 50
     );
 
     new TWEEN.Tween(mesh.position)
@@ -43,7 +55,7 @@ const scene = new THREE.Scene();
 
 const canvas = document.querySelector('canvas.webgl');
 const grassTexture = textureLoader.load('/textures/grass.jpg');
-const grassGeo = new THREE.CylinderGeometry(100, .6, .01, 24);
+const grassGeo = new THREE.CylinderGeometry(120, .6, .01, 24);
 
 const grassMaterial = new THREE.MeshStandardMaterial({ map: grassTexture, color: 'green' });
 const grassMesh = new THREE.Mesh(grassGeo, grassMaterial);
@@ -59,7 +71,7 @@ const soilSizes = {
 };
 
 
-const skyMadcap = textureLoader.load('/textures/sky.png');
+const skyMadcap = textureLoader.load('/textures/reflect2.png');
 const tomatoTexture = textureLoader.load('/textures/tomatoes.png');
 const blueSkyTexture = textureLoader.load('/textures/blue-sky-bg.jpg');
 const cornTexture = textureLoader.load('/textures/corn.png');
@@ -93,7 +105,7 @@ scene.add(soilMesh2);
 });
 
 dirtTexture.repeat.set(5, 5);
-grassTexture.repeat.set(15, 15);
+grassTexture.repeat.set(20, 20);
 
 
 let plantGroup = new THREE.Group();
@@ -216,6 +228,53 @@ loader.load('/models/EarOfCorn.glb', function(gltf) {
 });
 
 
+loader.load('/models/Farm.glb', function(gltf) {
+
+    scene.add(gltf.scene);
+    const farm = gltf.scene;
+    farm.scale.set(.2, .2, .2);
+    farm.position.set(75, 0, 17);
+    farm.rotation.set(0, 1, 0);
+
+}, undefined, function(error) {
+
+    console.error(error);
+});
+
+loader.load('/models/Cow.glb', function(gltf) {
+    for (let i = 0; i < 70; i++) {
+        const cow = gltf.scene.clone();
+        cow.scale.set(.3, .3, .3);
+        
+        const xFactor = 60; // forward back spread
+        const xOffset = 15;
+        const zFactor = 100; // left right spread
+        const zOffset = 0;
+
+        cow.position.set(
+            Math.random() > .5 // front or back 
+                ? Math.random() * xFactor + xOffset 
+                : Math.random() * -xFactor - xOffset, 
+            0,
+            Math.random() > .5 // left or right
+                ? Math.random() * zFactor + zOffset 
+                : Math.random() * -zFactor - zOffset);
+
+
+        cow.rotation.set(0, Math.random() * 10, 0);    
+    
+        scene.add(cow);     
+    }
+
+
+
+}, undefined, function(error) {
+
+    console.error(error);
+});
+
+
+
 loader.load('/models/Mountains.glb', function(gltf) {
 
     const children = [...gltf.scene.children];
@@ -302,12 +361,12 @@ loader.load('/models/Tomato.glb', function(gltf) {
 const fontLoader = new THREE.FontLoader();
 
 fontLoader.load(
-    '/fonts/helvetiker_bold.typeface.json',
+    '/fonts/optimer_regular.typeface.json',
     (font) =>
     {
         const options = {
             font: font,
-            size: 1,
+            size:sizes.width < MOBILE_WIDTH ? .4 : .5,
             height: 0.2,
             curveSegments: 12,
             bevelEnabled: true,
@@ -328,29 +387,40 @@ fontLoader.load(
         );
         const text2 = new THREE.Mesh(textGeometry2, textMaterial);
 
-        const rotations = [0, Math.PI * .7, 0];
-        text.position.set(5.8, 4.6, 6.2);
-        text2.position.set(4.8, 3.3, 4.1);
+        const rotations = [0, 1.6, 0];
+
         text.rotation.set(...rotations);
         text2.rotation.set(...rotations);
         
+        text.geometry.center();
+        text2.geometry.center();
+
         const textGroup = new THREE.Group();
         
-        const invisibleBoxGeo = new THREE.BoxGeometry(10, 4, 0);
-        const invisibleBoxMaterial = new THREE.MeshStandardMaterial({ transparent: true, opacity: 0 });
+        const invisibleBoxGeo = new THREE.BoxGeometry(sizes.width < 600 ? 4 : 5.8, 1.8, .5);
+        const invisibleBoxMaterial = new THREE.MeshStandardMaterial({ color: 'black', transparent: true, opacity: .85 });
 
         invisibleBoxMaterial.neverOpaque = true;
         const invisibleMesh = new THREE.Mesh(invisibleBoxGeo, invisibleBoxMaterial);
         
-        invisibleMesh.position.set(3.8, 4.6, -0.5);
         invisibleMesh.rotation.set(...rotations);
+
+
+        if (sizes.width < MOBILE_WIDTH){
+            text.position.set(12, 1.5, -4);
+            text2.position.set(12, .8, -4.4); 
+            invisibleMesh.position.set(11.5, 1.1, -4.3);   
+        } else {
+            text.position.set(9, 2.4, -3.8);
+            text2.position.set(9, 1.6, -4); 
+            invisibleMesh.position.set(8.5, 2., -3.8);
+        }
+
         textGroup.add(invisibleMesh);
         textGroup.add(text);
         textGroup.add(text2);
-
-        textGroup.children.forEach(child => child.onClick = () => {
-            window.open('https://dannycairns.com/DaniCairns--Resume.pdf');
-        });
+        
+        textGroup.children.forEach(child => child.onClick = navigateToResume);
 
         scene.add(textGroup);
     }
@@ -394,14 +464,16 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 1000);
-camera.position.set(12.4, 4.1, -5.2);
+
+if (sizes.width < MOBILE_WIDTH)camera.position.set(17, 2.8, -6.5);
+else camera.position.set(13, 2, -4.8);
 
 scene.add(camera);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.maxPolarAngle = Math.PI * .4; 
+controls.maxPolarAngle = Math.PI * .455; 
 controls.minDistance = 2;
 controls.maxDistance = 30;
 
@@ -464,7 +536,16 @@ window.addEventListener('click', (e) => {
     if (clickedOn && clickedOn && clickedOn.object && clickedOn.object.onClick) {
         clickedOn.object.onClick(clickedOn);
     }
+
 });
+
+let hasVisitedResume = false;
+window.addEventListener('touchend', () => {
+    if (!hasVisitedResume){ navigateToResume();
+        hasVisitedResume = true;
+    }
+}, false);
+
 
 const clock = new THREE.Clock();
 
@@ -517,3 +598,10 @@ function doRandomClick() {
 }
 
 setInterval(doRandomClick, 50);
+
+gui.add(camera.position, 'x', -20, 20);
+gui.add(camera.position, 'y', -20, 20);
+gui.add(camera.position, 'z', -20, 20);
+gui.add(camera.rotation, 'x', -20, 20);
+gui.add(camera.rotation, 'y', -20, 20);
+gui.add(camera.rotation, 'z', -20, 20);
