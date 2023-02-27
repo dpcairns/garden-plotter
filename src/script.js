@@ -18,21 +18,6 @@ const sizes = {
     height: window.innerHeight
 };
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth;
-    sizes.height = window.innerHeight;
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height;
-    camera.updateProjectionMatrix();
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
-
 
 function isMobile() {
     return sizes.width < MOBILE_WIDTH;
@@ -163,7 +148,7 @@ const veggies = {
     tomato: {
         height: 1.52,
         emoji: '🍅',
-        texture: tomatoTexture,
+        material: new THREE.MeshStandardMaterial({ map: tomatoTexture }),
         color: 'darkred'
     },
     corn: {
@@ -171,23 +156,24 @@ const veggies = {
         emoji: '🌽',
         texture: cornTexture,
         color: 'orange',
+        material: new THREE.MeshStandardMaterial({ map: cornTexture }),
     },
     potato: {
         height: .61,
         emoji: '🥔',
         color: '#4E3524',
-        texture: potatoTexture
+        material:  new THREE.MeshStandardMaterial({ map: potatoTexture }),
     },  
     kale: {
         height: .61,
         emoji: '🥬',
         color: 'darkgreen',
-        texture: kaleTexture,
+        material: new THREE.MeshStandardMaterial({ map: kaleTexture }),
     },    
     empty: {
         height: 0,
         emoji: '🪱',
-        texture: soloDirtTexture,
+        material: new THREE.MeshStandardMaterial({ map: soloDirtTexture }),
         color: BROWN
     }
 };
@@ -196,7 +182,7 @@ const veggies = {
 const veggieKeys = [...Object.keys(veggies)];
 
 
-
+const emptyColor = new THREE.Color({ color: BROWN });
 function displayPlantsThree() {
     garden.remove(plantGroup);
     plantGroup = new THREE.Group();
@@ -205,18 +191,12 @@ function displayPlantsThree() {
         forEach((row, i) => {
             [...row].reverse().forEach((plant, k) => {
                 const plantItemGroup = new THREE.Group();
-                const { texture, color, height = 0 } = veggies[plant];
+                const { material, height = 0 } = veggies[plant];
 
-                const threeColor = new THREE.Color(color);
-                const plantMaterial = new THREE.MeshStandardMaterial({ color: threeColor, map: texture });
-                const plantMesh = new THREE.Mesh(plantGeo, plantMaterial);
-
-                const labelMaterial = new THREE.MeshStandardMaterial({ map: texture });
-
-                if (plant === 'empty') labelMaterial.color = threeColor;
-                
-                const labelMesh = new THREE.Mesh(labelGeo, labelMaterial);
+                const plantMesh = new THREE.Mesh(plantGeo, material);
+                const labelMesh = new THREE.Mesh(labelGeo, material);
             
+                if (plants === 'empty') labelMesh.color = emptyColor;
                 plantMesh.scale.y = height;
                 labelMesh.rotation.y = Math.PI / 2;
 
@@ -599,6 +579,22 @@ manager.onLoad = () => {
     tweenTo(tomatoModel, modelPositions.tomato, 1000);
     tweenTo(textGroup, { x: 0, y: 0, z: 0 }, 1000);
 };
+
+
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth;
+    sizes.height = window.innerHeight;
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix();
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
 
 const clock = new THREE.Clock();
 
