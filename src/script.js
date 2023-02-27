@@ -4,6 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 // import * as dat from 'dat.gui';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
+import { convertArray } from 'three/src/animation/AnimationUtils';
+import { LoadingManager } from 'three';
 
 // const gui = new dat.GUI();
 
@@ -79,6 +81,7 @@ function tweenTo(mesh, xyz, delay = 1000, fromRight = false, fromBelow = false) 
                 : 50
     );
 
+
     new TWEEN.Tween(mesh.position)
         .to(xyz, 500)
         .delay(delay)
@@ -113,7 +116,7 @@ const grassGeo = new THREE.CylinderGeometry(120, .6, .01, 24);
 
 const grassMaterial = new THREE.MeshStandardMaterial({ map: grassTexture, color: 'green' });
 const grassMesh = new THREE.Mesh(grassGeo, grassMaterial);
-scene.add(grassMesh);
+
 
 
 const garden = new THREE.Group();
@@ -149,8 +152,6 @@ const soilMesh2 = new THREE.Mesh(soilGeo, soilMaterial);
 soilMesh2.scale.set(2, 2, 2);
 soilMesh2.scale.set(2, 2, 2);
 
-garden.add(soilMesh);
-scene.add(soilMesh2);
 
 
 [dirtTexture, grassTexture].forEach((texture) => {
@@ -248,24 +249,20 @@ function displayPlantsThree() {
     garden.add(plantGroup);
 }
 
+
+
+tweenTo(garden, { x: 0, y: 0, z: 0 }, 1500, true, true);
+
+
 displayPlantsThree();
-
-
-manager.onLoad = () => {
-    scene.add(garden);
-
-    tweenTo(garden, { x: 0, y: 0, z: 0 }, 1500, true, true);
-};
-
-
 
 let cornModel;
 
-const loader = new GLTFLoader();
+const loader = new GLTFLoader(manager);
 
 loader.load('/models/EarOfCorn.glb', function(gltf) {
 
-    scene.add(gltf.scene);
+ 
     const corn = gltf.scene;
     corn.scale.set(3.2, 3.2, 3.2);
 
@@ -278,45 +275,25 @@ loader.load('/models/EarOfCorn.glb', function(gltf) {
 });
 
 
+let farmModel;
 loader.load('/models/Farm.glb', function(gltf) {
-
-    scene.add(gltf.scene);
     const farm = gltf.scene;
     farm.scale.set(.2, .2, .2);
     farm.position.set(75, 0, 17);
     farm.rotation.set(0, 1, 0);
 
-}, undefined, function(error) {
+    farmModel = farm;
 
+
+}, undefined, function(error) {
+    
     console.error(error);
 });
+
+let firstCow;
 
 loader.load('/models/Cow.glb', function(gltf) {
-    for (let i = 0; i < 70; i++) {
-        const cow = gltf.scene.clone();
-        cow.scale.set(.3, .3, .3);
-        
-        const xFactor = 60; // forward back spread
-        const xOffset = 15;
-        const zFactor = 100; // left right spread
-        const zOffset = 0;
-
-        cow.position.set(
-            Math.random() > .5 // front or back 
-                ? Math.random() * xFactor + xOffset 
-                : Math.random() * -xFactor - xOffset, 
-            0,
-            Math.random() > .5 // left or right
-                ? Math.random() * zFactor + zOffset 
-                : Math.random() * -zFactor - zOffset);
-
-
-        cow.rotation.set(0, Math.random() * 10, 0);    
-    
-        scene.add(cow);     
-    }
-
-
+    firstCow = gltf.scene;
 
 }, undefined, function(error) {
 
@@ -324,24 +301,11 @@ loader.load('/models/Cow.glb', function(gltf) {
 });
 
 
+let mountainModel;
 
 loader.load('/models/Mountains.glb', function(gltf) {
+    mountainModel = [...gltf.scene.children];
 
-    const children = [...gltf.scene.children];
-    for (const child of children) {
-        scene.add(child);
-
-        child.scale.set(.4, .4, .7);
-        child.rotation.set(0, -48.4, 0);
-        child.position.set(-100,
-            -11.5,
-            47); 
-            
-    }   
-
-    
-
-    // mountainsModel = mountains;
 }, undefined, function(error) {
 
     console.error(error);
@@ -351,7 +315,7 @@ let carrotModel;
 
 loader.load('/models/Carrot.glb', function(gltf) {
 
-    scene.add(gltf.scene);
+ 
     const carrot = gltf.scene;
     carrot.scale.set(2, 2, 2);
     carrot.rotation.set(-1.5, 0, 0);
@@ -369,7 +333,7 @@ let broccoliModel;
 
 loader.load('/models/Broccoli.glb', function(gltf) {
 
-    scene.add(gltf.scene);
+ 
     const broccoli = gltf.scene;
     broccoli.scale.set(30, 30, 30);
 
@@ -386,7 +350,7 @@ let tomatoModel;
 
 loader.load('/models/Tomato.glb', function(gltf) {
 
-    scene.add(gltf.scene);
+ 
     const tomato = gltf.scene;
     tomato.scale.set(.03, .03, .03);
     
@@ -424,8 +388,8 @@ fontLoader.load(
 
         const textGeometry2 = new THREE.TextGeometry(
             'Web Developer',
-            options
-        );
+            options);
+     
         const text2 = new THREE.Mesh(textGeometry2, textMaterial);
 
         const rotations = [0, 1.6, 0];
@@ -467,16 +431,15 @@ fontLoader.load(
     }
 );
 
-// scene.fog = new THREE.Fog('#4E3524', 50, 125);
 
 // Lights
 const ambientLight = new THREE.AmbientLight('white', 1);
 
-scene.add(ambientLight);
+
 const pointLight = new THREE.PointLight('white', 1, 18);
 
 pointLight.position.set(4.5, 6, -4);
-scene.add(pointLight);
+
 
 /**
  * Camera
@@ -487,7 +450,7 @@ const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 
 if (isMobile())camera.position.set(17, 2.8, -6.5);
 else camera.position.set(13, 2, -4.8);
 
-scene.add(camera);
+
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
@@ -566,8 +529,56 @@ window.addEventListener('touchend', () => {
 }, false);
 
 
-const clock = new THREE.Clock();
 
+manager.onLoad = () => {
+    scene.add(soilMesh);
+    scene.add(soilMesh2);
+    scene.add(grassMesh);
+    scene.add(garden);
+    scene.add(cornModel);
+    scene.add(convertArray);
+    scene.add(tomatoModel);
+    scene.add(broccoliModel);
+    scene.add(ambientLight);
+    scene.add(pointLight);
+    scene.add(camera);
+    scene.add(farmModel);
+    for (let i = 0; i < 70; i++) {
+        const cow = firstCow.clone();
+        cow.scale.set(.3, .3, .3);
+        
+        const xFactor = 60; // forward back spread
+        const xOffset = 15;
+        const zFactor = 100; // left right spread
+        const zOffset = 0;
+    
+        cow.position.set(
+            Math.random() > .5 // front or back 
+                ? Math.random() * xFactor + xOffset 
+                : Math.random() * -xFactor - xOffset, 
+            0,
+            Math.random() > .5 // left or right
+                ? Math.random() * zFactor + zOffset 
+                : Math.random() * -zFactor - zOffset);
+
+
+        cow.rotation.set(0, Math.random() * 10, 0);    
+        scene.add(cow);
+    }
+
+
+    for (const child of mountainModel) {
+        child.scale.set(.4, .4, .7);
+        child.rotation.set(0, -48.4, 0);
+        child.position.set(-100,
+            -11.5,
+            47); 
+        scene.add(child);  
+    }   
+
+};
+
+const clock = new THREE.Clock();
 
 const randoms = Array(4).fill(null).map(() => Math.random() * -.6);
 
@@ -613,3 +624,4 @@ function doRandomClick() {
 }
 
 setInterval(doRandomClick, 50);
+
