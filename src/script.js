@@ -174,8 +174,8 @@ async function makeScene() {
     
     // Lights
     const ambientLight = new THREE.AmbientLight('white', .9);
-    const pointLight = new THREE.PointLight('white', 1.2, 18);
-    pointLight.position.set(4.5, 6, -4); 
+    const directionalLight = new THREE.DirectionalLight('white', 1.2, 18);
+    directionalLight.position.set(4.5, 6, -4); 
     
     // Camera
     const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, .01, 1000);
@@ -219,7 +219,7 @@ async function makeScene() {
         broccoliModel,
         carrotModel,
         ambientLight,
-        pointLight,
+        directionalLight,
         camera,
         farmModel,
         textGroup
