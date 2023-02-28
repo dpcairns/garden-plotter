@@ -21,9 +21,10 @@ npm run build
 
 *Carrot by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/3oFkNid6ofx)
 
+[Corn by Kenney](https://poly.pizza/m/NaEnzEW0JQ)
 *Broccoli by Jarlan Perez* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/bCmu5O24_Jv)
 
-Ear of *corn by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/3zsUEPnTdFt)
+<!-- Ear of *corn by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/3zsUEPnTdFt) -->
 
 *Tomato by Poly by Google* [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/0vxjCVR_euD)
 

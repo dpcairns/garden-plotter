@@ -2,10 +2,10 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import * as dat from 'dat.gui';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
+import * as dat from 'dat.gui';
 
-// const gui = new dat.GUI();
+const gui = new dat.GUI();
 
 
 const MOBILE_WIDTH = 600;
@@ -24,17 +24,17 @@ function isMobile() {
 }
 
 const modelPositions = {
-    tomato: {
+    corn: {
         x: -17,
         y: 6.3,
         z: -13
     },
-    carrot: {
+    tomato: {
         x: -12,
         y: 10,
         z: -1
     },
-    corn: {
+    carrot: {
         x: -2,
         y: 6.2,
         z: 19.5
@@ -148,7 +148,7 @@ const veggies = {
     tomato: {
         height: 1.52,
         emoji: '🍅',
-        material: new THREE.MeshStandardMaterial({ map: tomatoTexture }),
+        material: new THREE.MeshStandardMaterial({ map: tomatoTexture, color: 'darkred' }),
         color: 'darkred'
     },
     corn: {
@@ -156,24 +156,24 @@ const veggies = {
         emoji: '🌽',
         texture: cornTexture,
         color: 'orange',
-        material: new THREE.MeshStandardMaterial({ map: cornTexture }),
+        material: new THREE.MeshStandardMaterial({ map: cornTexture, color: 'orange' }),
     },
     potato: {
         height: .61,
         emoji: '🥔',
         color: '#4E3524',
-        material:  new THREE.MeshStandardMaterial({ map: potatoTexture }),
+        material:  new THREE.MeshStandardMaterial({ map: potatoTexture, color: '#4E3524' }),
     },  
     kale: {
         height: .61,
         emoji: '🥬',
         color: 'darkgreen',
-        material: new THREE.MeshStandardMaterial({ map: kaleTexture }),
+        material: new THREE.MeshStandardMaterial({ map: kaleTexture, color: 'darkgreen' }),
     },    
     empty: {
         height: 0,
         emoji: '🪱',
-        material: new THREE.MeshStandardMaterial({ map: soloDirtTexture }),
+        material: new THREE.MeshStandardMaterial({ map: soloDirtTexture, color: BROWN }),
         color: BROWN
     }
 };
@@ -230,14 +230,14 @@ let cornModel;
 
 const loader = new GLTFLoader(manager);
 
-loader.load('/models/EarOfCorn.glb', function(gltf) {
+loader.load('/models/Corn2.glb', function(gltf) {
 
  
     const corn = gltf.scene;
-    corn.scale.set(3.2, 3.2, 3.2);
-
+    corn.scale.set(20, 20, 20);
+    corn.position.set(-14, 5.1, -13);
+    corn.rotation.set(-10, 10, 0);
     
-
     cornModel = corn;
 }, undefined, function(error) {
 
@@ -400,9 +400,18 @@ fontLoader.load(
 const ambientLight = new THREE.AmbientLight('white', .9);
 
 
-const pointLight = new THREE.PointLight('white', 1.2, 18);
+const pointLight = new THREE.PointLight('white', 1, 18);
+
+const pointLight2 = new THREE.PointLight('white', 1, 18);
+const pointLight3 = new THREE.PointLight('white', 1, 18);
 
 pointLight.position.set(4.5, 6, -4);
+pointLight2.position.set(-7, 13, -5);
+pointLight3.position.set(4, 3.5, 10);
+
+gui.add(pointLight.position, 'x', -10, 10).name('light');
+gui.add(pointLight.position, 'y', -10, 20).name('light');
+gui.add(pointLight.position, 'z', -10, 10).name('light');
 
 
 let hasClicked = false;
@@ -536,6 +545,9 @@ manager.onLoad = () => {
     scene.add(carrotModel);
     scene.add(ambientLight);
     scene.add(pointLight);
+    scene.add(pointLight2);
+    scene.add(pointLight3);
+
     scene.add(camera);
     scene.add(farmModel);
     scene.add(textGroup);
@@ -601,7 +613,7 @@ const clock = new THREE.Clock();
 const randoms = Array(4).fill(null).map(() => Math.random() * -.6);
 
 const tick = () => {
-    const models = [cornModel, carrotModel, broccoliModel, tomatoModel];
+    const models = [carrotModel, broccoliModel, tomatoModel];
 
     const elapsedTime = clock.getElapsedTime();
 
@@ -612,6 +624,12 @@ const tick = () => {
             model.rotation.x = factor * elapsedTime;
             model.rotation.z = factor * elapsedTime;
         });
+
+        cornModel.rotation.x = .2 * elapsedTime;
+        cornModel.rotation.z = .2 * elapsedTime;
+        tomatoModel.rotation.x = .4 * elapsedTime;
+        tomatoModel.rotation.z = -.4 * elapsedTime;
+
     }
     // Update objects
 
