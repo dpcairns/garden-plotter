@@ -400,10 +400,10 @@ fontLoader.load(
 const ambientLight = new THREE.AmbientLight('white', .9);
 
 
-const directionalLight = new THREE.DirectionalLight('white', 1);
+const directionalLight = new THREE.DirectionalLight('white', 1, 18);
 
 
-directionalLight.position.set(4.5, 7, -4);
+directionalLight.position.set(4.5, 6, -4);
 
 let hasClicked = false;
 /**
