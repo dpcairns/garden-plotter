@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
-import * as dat from 'dat.gui';
+// import * as dat from 'dat.gui';
 
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 
 
 const MOBILE_WIDTH = 600;
@@ -408,11 +408,6 @@ const pointLight3 = new THREE.PointLight('white', 1, 18);
 pointLight.position.set(4.5, 6, -4);
 pointLight2.position.set(-7, 13, -5);
 pointLight3.position.set(4, 3.5, 10);
-
-gui.add(pointLight.position, 'x', -10, 10).name('light');
-gui.add(pointLight.position, 'y', -10, 20).name('light');
-gui.add(pointLight.position, 'z', -10, 10).name('light');
-
 
 let hasClicked = false;
 /**
