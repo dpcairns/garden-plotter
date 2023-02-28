@@ -400,14 +400,10 @@ fontLoader.load(
 const ambientLight = new THREE.AmbientLight('white', .9);
 
 
-const pointLight = new THREE.PointLight('white', 1, 18);
+const directionalLight = new THREE.DirectionalLight('white', 1);
 
-const pointLight2 = new THREE.PointLight('white', 1, 18);
-const pointLight3 = new THREE.PointLight('white', 1, 18);
 
-pointLight.position.set(4.5, 6, -4);
-pointLight2.position.set(-7, 13, -5);
-pointLight3.position.set(4, 3.5, 10);
+directionalLight.position.set(4.5, 7, -4);
 
 let hasClicked = false;
 /**
@@ -539,9 +535,7 @@ manager.onLoad = () => {
     scene.add(broccoliModel);
     scene.add(carrotModel);
     scene.add(ambientLight);
-    scene.add(pointLight);
-    scene.add(pointLight2);
-    scene.add(pointLight3);
+    scene.add(directionalLight);
 
     scene.add(camera);
     scene.add(farmModel);
