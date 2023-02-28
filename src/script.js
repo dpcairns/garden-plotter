@@ -161,8 +161,8 @@ const veggies = {
     potato: {
         height: .61,
         emoji: '🥔',
-        color: '#4E3524',
-        material:  new THREE.MeshStandardMaterial({ map: potatoTexture, color: '#4E3524' }),
+        color: '#988558',
+        material:  new THREE.MeshStandardMaterial({ map: potatoTexture, color: '#988558' }),
     },  
     kale: {
         height: .61,
