@@ -54,6 +54,10 @@ footer {
 
 
 @media (max-width: 600px) {
+    .loading img {
+        width: 100%;
+     }
+     
     footer {
         width: 100%;
         padding-left: 10px;
