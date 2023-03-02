@@ -1,4 +1,5 @@
 import './style.css';
+import './favicon.js'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -46,13 +47,13 @@ const modelPositions = {
     }
 };
 
-function tweenTo(mesh, xyz, delay = 1000, fromRight = false, fromBelow = false) {
+function tweenTo(mesh, xyz, delay = 1000, fromRight = false, fromBelow = false, isLittleWords = false) {
     mesh.position.set(
         0, fromBelow 
             ? -3
             : 20, 
         fromBelow 
-            ? 0 
+            ? isLittleWords ? -10 : 0 
             : fromRight 
                 ? -50 
                 : 50
@@ -66,6 +67,8 @@ function tweenTo(mesh, xyz, delay = 1000, fromRight = false, fromBelow = false) 
         //.onUpdate(() => render())
         .start();
 }
+
+
 
 const BROWN = '#964B00';
 
@@ -231,8 +234,6 @@ let cornModel;
 const loader = new GLTFLoader(manager);
 
 loader.load('/models/Corn2.glb', function(gltf) {
-
- 
     const corn = gltf.scene;
     corn.scale.set(20, 20, 20);
     corn.position.set(-14, 5.1, -13);
@@ -330,7 +331,10 @@ loader.load('/models/Tomato.glb', function(gltf) {
 const fontLoader = new THREE.FontLoader();
 
 let textGroup;
-
+let textGroup2;
+let musicianText;
+let writerText;
+let boardGameText;
 fontLoader.load(
     '/fonts/optimer_regular.typeface.json',
     (font) =>
@@ -349,49 +353,88 @@ fontLoader.load(
 
         const textGeometry = new THREE.TextGeometry(
             'Dani Cairns', options);
-        const textMaterial = new THREE.MeshMatcapMaterial({ matcap: skyMadcap });
-        const text = new THREE.Mesh(textGeometry, textMaterial);
-
         const textGeometry2 = new THREE.TextGeometry(
-            'Web Developer',
-            options);
-     
-        const text2 = new THREE.Mesh(textGeometry2, textMaterial);
+            'Web Developer', options);
+        const textMaterial = new THREE.MeshMatcapMaterial({ matcap: skyMadcap });
+        const nameText = new THREE.Mesh(textGeometry, textMaterial);
+        const webDeveloperText = new THREE.Mesh(textGeometry2, textMaterial);
 
-        const rotations = [0, 1.6, 0];
+        const rotations = [0, Math.PI / 2, 0];
 
-        text.rotation.set(...rotations);
-        text2.rotation.set(...rotations);
+        nameText.rotation.set(...rotations);
+        webDeveloperText.rotation.set(...rotations);
         
-        text.geometry.center();
-        text2.geometry.center();
+        nameText.geometry.center();
+        webDeveloperText.geometry.center();
 
         textGroup = new THREE.Group();
         
-        const invisibleBoxGeo = new THREE.BoxGeometry(sizes.width < 600 ? 4 : 5.8, 1.8, .5);
-        const invisibleBoxMaterial = new THREE.MeshStandardMaterial({ color: 'black', transparent: true, opacity: .75 });
+        const backgroundBoxGeo = new THREE.BoxGeometry(sizes.width < 600 ? 4 : 5.8, 1.8, .5);
+        const backgroundBoxMaterial = new THREE.MeshStandardMaterial({ color: 'black', transparent: true, opacity: .75 });
 
-        invisibleBoxMaterial.neverOpaque = true;
-        const invisibleMesh = new THREE.Mesh(invisibleBoxGeo, invisibleBoxMaterial);
+        backgroundBoxMaterial.neverOpaque = true;
+        const backgroundMesh = new THREE.Mesh(backgroundBoxGeo, backgroundBoxMaterial);
         
-        invisibleMesh.rotation.set(...rotations);
+        backgroundMesh.rotation.set(...rotations);
 
+        const textGeometry3 = new THREE.TextGeometry(
+            'musician', options);
+        const textGeometry4 = new THREE.TextGeometry(
+            'writer', options);
+        const textGeometry5 = new THREE.TextGeometry(
+            'board game liker', options);
+
+        musicianText = new THREE.Mesh(textGeometry3, textMaterial);
+        writerText = new THREE.Mesh(textGeometry4, textMaterial);
+        boardGameText = new THREE.Mesh(textGeometry5, textMaterial);
+
+        musicianText.geometry.center();
+        writerText.geometry.center();
+        boardGameText.geometry.center();
+        textGroup2 = new THREE.Group();
 
         if (isMobile()){
-            text.position.set(12, 1.5, -4);
-            text2.position.set(12, .8, -4.4); 
-            invisibleMesh.position.set(11.5, 1.1, -4.3);   
+            nameText.position.set(12, 1.5, -4);
+            webDeveloperText.position.set(12, .8, -4.4); 
+            backgroundMesh.position.set(11.5, 1.1, -4.3); 
+            textGroup2.position.set(15, .2, -2);
+            textGroup2.rotation.set(0, Math.PI / 2 + .3, 0);
+            
+            textGroup2.add(musicianText);
+            textGroup2.add(writerText);
+            textGroup2.add(boardGameText);
+            boardGameText.position.x = 2.3;
+            musicianText.position.x = 2.8;
+            musicianText.position.y = -1.5;
+            writerText.position.x = 1.8;
+            writerText.position.y = -2.8;
+  
         } else {
-            text.position.set(9, 2.4 + .25, -3.8);
-            text2.position.set(9, 1.6 + .25, -4); 
-            invisibleMesh.position.set(8.5, 2. + .25, -3.8);
-        }
-
-        textGroup.add(invisibleMesh);
-        textGroup.add(text);
-        textGroup.add(text2);
+            nameText.position.set(9, 2.4 + .25, -3.8);
+            webDeveloperText.position.set(9, 1.6 + .25, -4); 
+            backgroundMesh.position.set(8.5, 2. + .25, -3.8);
+            textGroup2.position.set(11, .2, -2);
+            textGroup2.rotation.set(0, Math.PI / 2 + .3, 0);
+            textGroup2.add(musicianText);
+            textGroup2.add(writerText);
+            textGroup2.add(boardGameText);
+            musicianText.position.x = .4;
+            musicianText.position.y = -.1;
+            writerText.position.y = .5;
+            writerText.position.x = 3.8;
+            boardGameText.position.y = 1.5;
         
-        console.log(textGroup.position);
+        }
+        const TILT = .5;
+        musicianText.rotateX(TILT);
+        writerText.rotateX(TILT);
+        boardGameText.rotateX(TILT);
+        textGroup2.rotateX(-Math.PI / 2);
+
+
+        textGroup.add(backgroundMesh);
+        textGroup.add(nameText);
+        textGroup.add(webDeveloperText);
     }
 );
 
@@ -493,13 +536,10 @@ manager.onLoad = () => {
 
     window.addEventListener('click', () => {
         if (!hasClicked) {
-            new TWEEN.Tween(camera.position)
-            // .to({ x: 22, y: 2.8, z: -6.5 }, 500)
-                .to({ x: 8.7, y: 6.8, z: -14 }, 500)
-
-                .easing(TWEEN.Easing.Cubic.Out)
-    //.onUpdate(() => render())
-                .start();
+            // new TWEEN.Tween(camera.position)
+            //     .to({ x: 8.7, y: 6.8, z: -14 }, 500)
+            //     .easing(TWEEN.Easing.Cubic.Out)
+            //     .start();
         }
 
         hasClicked = true;
@@ -540,6 +580,7 @@ manager.onLoad = () => {
     scene.add(camera);
     scene.add(farmModel);
     scene.add(textGroup);
+    scene.add(textGroup2);
     for (let i = 0; i < 70; i++) {
         const cow = firstCow.clone();
         cow.scale.set(.3, .3, .3);
@@ -548,11 +589,15 @@ manager.onLoad = () => {
         const xOffset = 15;
         const zFactor = 100; // left right spread
         const zOffset = 0;
-    
+        const maxCowClosesness = isMobile() ? 25 : 16;
+        const randomCowX = Math.random() > .5 // close or far
+        ? Math.random() * xFactor + xOffset
+        : Math.random() * -xFactor - xOffset;
+
+        const cowX = randomCowX > 0 ? Math.max(randomCowX, maxCowClosesness) : randomCowX;
         cow.position.set(
-            Math.random() > .5 // front or back 
-                ? Math.random() * xFactor + xOffset 
-                : Math.random() * -xFactor - xOffset, 
+            cowX
+            ,
             0,
             Math.random() > .5 // left or right
                 ? Math.random() * zFactor + zOffset 
@@ -574,6 +619,11 @@ manager.onLoad = () => {
     }   
 
     tweenTo(garden, { x: 0, y: 0, z: 0 }, 1500, true, true);
+    tweenTo(musicianText, { ...musicianText.position }, 2000, true, true, true);
+    tweenTo(boardGameText, { ...boardGameText.position }, 2500, true, true, true);
+    tweenTo(writerText, {...writerText.position }, 3000, true, true, true);
+
+
     tweenTo(cornModel, modelPositions.corn, 800, true);
     tweenTo(carrotModel, modelPositions.carrot, 400);
     tweenTo(broccoliModel, modelPositions.broccoli, 700, true);
