@@ -536,10 +536,10 @@ manager.onLoad = () => {
 
     window.addEventListener('click', () => {
         if (!hasClicked) {
-            // new TWEEN.Tween(camera.position)
-            //     .to({ x: 8.7, y: 6.8, z: -14 }, 500)
-            //     .easing(TWEEN.Easing.Cubic.Out)
-            //     .start();
+            new TWEEN.Tween(camera.position)
+                .to({ x: 8.7, y: 6.8, z: -14 }, 500)
+                .easing(TWEEN.Easing.Cubic.Out)
+                .start();
         }
 
         hasClicked = true;
