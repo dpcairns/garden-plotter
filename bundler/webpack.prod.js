@@ -9,6 +9,9 @@ module.exports = merge(
         plugins:
         [
             new CleanWebpackPlugin()
-        ]
+        ],
+        output: {
+            assetModuleFilename: "assets/imgages/[name].[hash][ext]"
+        }
     }
 )

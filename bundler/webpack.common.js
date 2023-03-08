@@ -20,6 +20,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../src/index.html'),
+            favicon: path.resolve(__dirname, './static/favicon-32x32.png'),
             minify: true
         }),
         new MiniCSSExtractPlugin()
@@ -60,7 +61,7 @@ module.exports = {
                 use:
                 [
                     {
-                        loader: 'file-loader',
+                        loader: 'asset/resources',
                         options:
                         {
                             outputPath: 'assets/images/'
