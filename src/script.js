@@ -4,9 +4,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min';
+import spinner from './spinner.gif';
 
 const loadingImgEl = document.querySelector('.loading img');
-loadingImgEl.src = '/spinner.gif';
+loadingImgEl.src = spinner;
 // import * as dat from 'dat.gui';
 
 // const gui = new dat.GUI();
